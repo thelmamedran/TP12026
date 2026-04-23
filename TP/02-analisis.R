@@ -22,7 +22,11 @@ ggplot(datos_torta, aes(x = "", y = n, fill = Dimensión_mejor_puntuada)) +
     plot.title = element_text(hjust = 0.5, face = "bold")
   )
 
-
+# Moda
+datos %>%
+  filter(!is.na(Dimensión_mejor_puntuada)) %>%
+  count(Dimensión_mejor_puntuada, sort = TRUE) %>%
+  slice(1)
 
 
 # descripción gráfica de una variable categórica medida en escala ordinal
@@ -31,7 +35,7 @@ datos %>%
   filter(!is.na(MNG_Fuentes_Sec)) %>%
   mutate(
     sec_mng_ordenado = factor(
-      sec_mng, 
+      MNG_Fuentes_Sec, 
       levels = c("Muy bajo", "Bajo", "Medio", "Alto", "Muy alto") # Del peor al mejor
     )
   ) %>%
@@ -47,9 +51,12 @@ datos %>%
   
   theme_minimal()
 
+# Moda 
 
-
-
+datos %>%
+  filter(!is.na(MNG_Fuentes_Sec)) %>%
+  count(MNG_Fuentes_Sec, sort = TRUE) %>%
+  slice(1)
 
 # descripción gráfica de una variable categórica de respuesta múltiple 
 
@@ -93,7 +100,7 @@ ggplot(tabla_multiple_girai) +
 
 # Africa
 datos %>%
-  filter(NU_region == "África") %>%
+  filter(Continente == "África") %>%
   
   ggplot(aes(x = Areas_AG)) +
   geom_bar(
@@ -117,9 +124,19 @@ datos %>%
   
   theme_minimal()
 
+# Medidas resumen
+datos %>%
+  filter(Continente == "África", !is.na(Areas_AG)) %>%
+  summarise(
+    promedio = mean(Areas_AG),
+    mediana = median(Areas_AG),
+    desvio_estandar = sd(Areas_AG),
+    varianza = var(Areas_AG)
+  )
+
 # Europa
 datos %>%
-  filter(NU_region == "Europa") %>%
+  filter(Continente == "Europa") %>%
   
   ggplot(aes(x = Areas_AG)) +
   geom_bar(
@@ -143,19 +160,29 @@ datos %>%
   
   theme_minimal()
 
+# Medidas resumen
+datos %>%
+  filter(Continente == "Europa", !is.na(Areas_AG)) %>%
+  summarise(
+    promedio = mean(Areas_AG),
+    mediana = median(Areas_AG),
+    desvio_estandar = sd(Areas_AG),
+    variancia = var(Areas_AG)
+  )
+
 # descripción gráfica de una variable cuantitativa continua 
 
 # Histograma para Marcos Normativos Gubernamentales
 ggplot(datos, aes(x = Marcos_nor_gub)) +
   geom_histogram(
     binwidth = int_mng,
-    boundary = min(datos$Marcos_nor_gub),
+    boundary = 0,
     fill = "#2980b9",
     color = "white"
   ) +
   scale_x_continuous(
     breaks = seq(
-      min(datos$Marcos_nor_gub),
+      0,
       max(datos$Marcos_nor_gub) + int_mng,
       by = int_mng
     )
@@ -193,13 +220,13 @@ ggplot(datos, aes(x = Acciones_gub)) +
 ggplot(datos, aes(x = Actores_NE)) +
   geom_histogram(
     binwidth = int_ane,
-    boundary = min(datos$Actores_NE),
+    boundary = 0,
     fill = "#e67e22",
     color = "white"
   ) +
   scale_x_continuous(
     breaks = seq(
-      min(datos$Actores_NE),
+      0,
       max(datos$Actores_NE) + int_ane,
       by = int_ane
     )
@@ -211,77 +238,63 @@ ggplot(datos, aes(x = Actores_NE)) +
   ) +
   theme_minimal()
 
-# descripción gráfica de la relación entre dos variables categóricas
-# privado
-ggplot(datos) +
-  aes(x = NU_region, fill = privado) + 
-  
-  geom_bar(position = "fill") + 
-  
+# Histograma para GIRAI
+
+ggplot(datos, aes(x = GIRAI)) +
+  geom_histogram(
+    binwidth = int_girai,
+    boundary = 0,
+    fill = "#FF69B4",
+    color = "white"
+  ) +
+  scale_x_continuous(
+    breaks = seq(
+      0,
+      max(datos$GIRAI) + int_girai,
+      by = int_girai
+    )
+  ) +
   labs(
-    title = "Proporción de países con iniciativas del sector privado por Continente\nFuente: GCG, 2023-2024",
-    x = "Continente",
-    y = "Proporción",
-    fill = "¿Hay privado?"
+    title = "Distribución de puntaje GIRAI\nFuente: GCG, 2023-2024",
+    x = "Intervalos de puntaje",
+    y = "Frecuencia"
   ) +
   theme_minimal()
 
-# academia
-ggplot(datos) +
-  aes(x = NU_region, fill = academia) + 
-  
-  geom_bar(position = "fill") + 
-  
-  labs(
-    title = "Proporción de países con iniciativas académicas por Continente\nFuente: GCG, 2023-2024",
-    x = "Continente",
-    y = "Proporción",
-    fill = "¿Hay academia?"
-  ) +
-  theme_minimal()
+# Medidas resumen de GIRAI
 
-# descripción gráfica de la relación entre una variable categórica y una variable cuantitativa
 datos %>%
-  filter(!is.na(NU_region), !is.na(GIRAI)) %>%
-  
-  ggplot(aes(x = NU_region, y = GIRAI, fill = NU_region)) +
-  
-  geom_boxplot(alpha = 0.7, width = 0.6) +
-  
-  labs(
-    title = "Distribución del índice GIRAI según continente\nFuente: GCG, 2023-2024",
-    x = "Continente",
-    y = "Puntaje GIRAI"
-  ) +
-  
-  theme_minimal() +
-  
-  theme(
-    legend.position = "none",
-    plot.title = element_text(hjust = 0.5, face = "bold")
+  filter(!is.na(GIRAI)) %>%
+  summarise(
+    minimo = min(GIRAI),
+    q1 = quantile(GIRAI, 0.25),
+    mediana = median(GIRAI),
+    promedio = mean(GIRAI),
+    q3 = quantile(GIRAI, 0.75),
+    maximo = max(GIRAI),
+    rango = max(GIRAI) - min(GIRAI),
+    desvio_estandar = sd(GIRAI),
+    variancia = var(GIRAI),
   )
 
+# Tabla comparativa del GIRAI por continente
 
-#  descripción gráfica de la relación entre dos variables cuantitativas
-datos_bivariado <- datos %>%
-  mutate(
-    suma_principios = rowSums(across(starts_with("p70_")), na.rm = TRUE)
-  )
+tabla_continentes <- datos %>%
+  filter(!is.na(Continente), !is.na(GIRAI)) %>%
+  group_by(Continente) %>%
+  summarise(
+    Cantidad_paises = n(),
+    Promedio = round(mean(GIRAI), 2),
+    Mediana = round(median(GIRAI), 2),
+    Q1 = round(quantile(GIRAI, 0.25), 2),
+    Q3 = round(quantile(GIRAI, 0.75), 2),
+    Minimo = round(min(GIRAI), 2),
+    Maximo = round(max(GIRAI), 2),
+    Desvio_estandar = round(sd(GIRAI), 2),
+    Rango = round(max(GIRAI) - min(GIRAI), 2)
+  ) %>%
+  arrange(desc(Promedio))
 
-ggplot(datos_bivariado) + 
-  
-  aes(x = suma_principios, y = GIRAI) + 
-  
-  geom_jitter(width = 0.2, height = 0, color = "#008B8B", alpha = 0.6, size = 2) + 
-  
-  geom_smooth(method = "lm", color = "#FF69B4", se = FALSE) +
-  
-  scale_x_continuous(breaks = seq(0, 9, by = 1)) +
-  
-  labs(
-    title = "Relación entre el GIRAI y la cantidad de dimensiones con puntaje mayor a 70\nFuente: GCG, 2023-2024",
-    x = "Cantidad de dimensiones con puntaje mayor a 70",
-    y = "Puntaje GIRAI"
-  ) +
-  
-  theme_minimal()
+tabla_continentes
+
+

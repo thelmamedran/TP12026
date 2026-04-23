@@ -6,7 +6,7 @@ attach(datos)
 # descripción gráfica de la relación entre dos variables categóricas
 # privado
 ggplot(datos) +
-  aes(x = Continente, fill = privado) + 
+  aes(x = Continente, fill = Privado) + 
   
   geom_bar(position = "fill") + 
   
@@ -20,7 +20,7 @@ ggplot(datos) +
 
 # academia
 ggplot(datos) +
-  aes(x = Continente, fill = academia) + 
+  aes(x = Continente, fill = Academia) + 
   
   geom_bar(position = "fill") + 
   
@@ -70,7 +70,7 @@ print(dispersion_continentes)
 #  descripción gráfica de la relación entre dos variables cuantitativas
 datos_bivariado <- datos %>%
   mutate(
-    suma_principios = rowSums(across(starts_with("p70_")), na.rm = TRUE)
+    suma_principios = rowSums(across(starts_with("P70_")), na.rm = TRUE)
   )
 
 ggplot(datos_bivariado) + 
