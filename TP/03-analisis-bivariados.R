@@ -84,8 +84,8 @@ ggplot(datos_bivariado) +
   scale_x_continuous(breaks = seq(0, 9, by = 1)) +
   
   labs(
-    title = "Relación entre el GIRAI y la cantidad de dimensiones con puntaje mayor a 70\nFuente: GCG, 2023-2024",
-    x = "Cantidad de dimensiones con puntaje mayor a 70",
+    title = "Relación entre el GIRAI y la cantidad de áreas con puntaje mayor a 70\nFuente: GCG, 2023-2024",
+    x = "Cantidad de áreas con puntaje mayor a 70",
     y = "Puntaje GIRAI"
   ) +
   
