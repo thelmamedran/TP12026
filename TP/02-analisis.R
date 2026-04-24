@@ -108,74 +108,36 @@ print(grafico_multiple)
 # descripción gráfica de una variable cuantitativa discreta
 # -----------------------------------------------------------------------
 
-# africa
+# Todos los países (Gráfico de bastones)
 
-grafico_africa <- datos %>%
-  filter(Continente == "África") %>%
+grafico_bastones_global <- datos %>%
+  filter(!is.na(Areas_AG)) %>%
   ggplot(aes(x = Areas_AG)) +
   geom_bar(
     fill = "#0F2A44",
-    width = 0.08
+    width = 0.1 
   ) +
   labs(
-    title = "Distribución de áreas con Acciones Gubernamentales en países de África\nFuente: GCG, 2023-2024",
+    title = "Distribución de áreas con Acciones Gubernamentales a nivel global\nFuente: GCG, 2023-2024",
     x = "Cantidad de áreas cubiertas",
     y = "Frecuencia de países"
   ) +
   scale_x_continuous(
-    breaks = seq(
-      min(datos$Areas_AG, na.rm = TRUE),
-      max(datos$Areas_AG, na.rm = TRUE),
-      by = 1
-    )
+    breaks = seq(0, 19, by = 1),
+    limits = c(-0.5, 19.5) # asi se ve en el eje x de 0 a 19
   ) +
   theme_minimal()
-print(grafico_africa)
+print(grafico_bastones_global)
 
-# medidas resumen
+# medidas resumen globales
 
 print(datos %>%
-        filter(Continente == "África", !is.na(Areas_AG)) %>%
+        filter(!is.na(Areas_AG)) %>%
         summarise(
           promedio = mean(Areas_AG),
           mediana = median(Areas_AG),
           desvio_estandar = sd(Areas_AG),
           varianza = var(Areas_AG)
-        ))
-
-# europa
-
-grafico_europa <- datos %>%
-  filter(Continente == "Europa") %>%
-  ggplot(aes(x = Areas_AG)) +
-  geom_bar(
-    fill = "#0F2A44",
-    width = 0.08
-  ) +
-  labs(
-    title = "Distribución de áreas con Acciones Gubernamentales en países de Europa\nFuente: GCG, 2023-2024",
-    x = "Cantidad de áreas cubiertas",
-    y = "Frecuencia de países"
-  ) +
-  scale_x_continuous(
-    breaks = seq(
-      min(datos$Areas_AG, na.rm = TRUE),
-      max(datos$Areas_AG, na.rm = TRUE),
-      by = 1
-    )
-  ) +
-  theme_minimal()
-print(grafico_europa)
-
-# medidas resumen 
-
-print(datos %>%
-        filter(Continente == "Europa", !is.na(Areas_AG)) %>%
-        summarise(
-          promedio = mean(Areas_AG),
-          mediana = median(Areas_AG),
-          desvio_estandar = sd(Areas_AG),
-          variancia = var(Areas_AG)
         ))
 
 # -----------------------------------------------------------------------
