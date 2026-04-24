@@ -7,33 +7,31 @@ paleta_colores <- c("#0F2A44", "#2E5E8A", "#5B8DB8", "#A7C0D9", "#DCE3EA")
 # descripción gráfica de la relación entre dos variables categóricas
 # -----------------------------------------------------------------------
 
-# privado
-grafico_privado <- ggplot(datos) +
-  aes(x = Continente, fill = Privado) + 
-  geom_bar(position = "fill") + 
-  scale_fill_manual(values = paleta_colores) +
-  labs(
-    title = "Proporción de países con iniciativas del sector privado por Continente\nFuente: GCG, 2023-2024",
-    x = "Continente",
-    y = "Proporción",
-    fill = "¿Hay privado?"
-  ) +
-  theme_minimal()
-print(grafico_privado)
+datos_agrupados <- datos %>%
+  filter(!is.na(Continente)) %>%
+  select(Continente, Academia, Privado) %>%
+  pivot_longer(cols = c(Academia, Privado), names_to = "Sector", values_to = "Estado") %>%
+  group_by(Continente, Sector) %>%
+  summarise(
+    # solo casos afirmativos
+    Porcentaje = sum(Estado %in% c("Sí", "Si", "1", 1, "Yes", "Tiene"), na.rm = TRUE) / n() * 100,
+    .groups = "drop"
+  )
 
-# academia
-grafico_academia <- ggplot(datos) +
-  aes(x = Continente, fill = Academia) + 
-  geom_bar(position = "fill") + 
-  scale_fill_manual(values = paleta_colores) +
+grafico_sectores <- ggplot(datos_agrupados, aes(x = Continente, y = Porcentaje, fill = Sector)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8), width = 0.7) +
+  scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, by = 10)) +
+  scale_fill_manual(values = c(paleta_colores[1], paleta_colores[3])) +
   labs(
-    title = "Proporción de países con iniciativas académicas por Continente\nFuente: GCG, 2023-2024",
+    title = "Porcentaje de países con iniciativas del sector privado y académico\nSegún continente, Fuente: GCG, 2023-2024",
     x = "Continente",
-    y = "Proporción",
-    fill = "¿Hay academia?"
+    y = "Porcentaje (%)",
+    fill = "Sector"
   ) +
-  theme_minimal()
-print(grafico_academia)
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+
+print(grafico_sectores)
 
 # -----------------------------------------------------------------------
 # descripción gráfica de la relación entre una variable categórica y una variable cuantitativa
@@ -81,8 +79,8 @@ grafico_dispersion <- ggplot(datos_bivariado) +
   geom_smooth(method = "lm", color = "#0F2A44", se = FALSE) +
   scale_x_continuous(breaks = seq(0, 9, by = 1)) +
   labs(
-    title = "Relación entre el GIRAI y la cantidad de áreas con puntaje mayor a 70\nFuente: GCG, 2023-2024",
-    x = "Cantidad de áreas con puntaje mayor a 70",
+    title = "Relación entre el GIRAI y la cantidad de dimensiones con puntaje mayor a 70\nFuente: GCG, 2023-2024",
+    x = "Cantidad de dimensiones con puntaje mayor a 70",
     y = "Puntaje GIRAI"
   ) +
   theme_minimal()
